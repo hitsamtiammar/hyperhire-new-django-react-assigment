@@ -1,0 +1,1 @@
+web: python backend/app/manage.py runserver %PORT%
