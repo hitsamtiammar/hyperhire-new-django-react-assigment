@@ -1,1 +1,1 @@
-web: python backend/app/manage.py runserver %PORT%
+web: gunicorn app.wsgi -log-file -
