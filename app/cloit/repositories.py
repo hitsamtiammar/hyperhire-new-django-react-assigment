@@ -19,7 +19,7 @@ def get_all_root():
        d = MenuItem.objects.filter(parent_id__isnull = True)
        return d
     except Exception:
-        return None
+        return []
     
 def get_all_data(id, depth = 1):
     try:
