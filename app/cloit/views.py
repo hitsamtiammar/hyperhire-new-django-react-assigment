@@ -12,11 +12,17 @@ def index(request):
     })
 
 @api_view(['GET'])
-def views_data(request):
-    data = repositories.get_all()
-    serialized = MenuItemSerializer(data, many =True)
+def views_data_root(request):
+    data = repositories.get_all_root()
     return JsonResponse({
-        'data': serialized.data
+        'data': data
+    })
+
+@api_view(['GET'])
+def views_data_data(request, id):
+    data = repositories.get_all_data(id)
+    return JsonResponse({
+        'data': data
     })
 
 @api_view(['POST'])
