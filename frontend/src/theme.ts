@@ -17,21 +17,30 @@ export default createTheme({
         },
         secondary: {
             main: '#A4A6B3',
-            contrastText: '#373F41'
+            light: '#475467',
+            contrastText: '#373F41',
         },
         info: {
             main: '#1D2939',
-            light: '#52575C'
+            light: '#52575C',
+            
+        },
+        lightgray: {
+             main: '#D0D5DD'
         },
         gray: {
-            main: '#667085'
+            main: '#667085',
         },
         warning: {
-            main: '#737B7D'
+            main: '#F9FAFB',
         },
         lime: {
             main: '#9FF443',
             contrastText: '#101828'
+        },
+        blue: {
+            main: '#253BFF',
+            contrastText: 'white'
         }
     }
 })
