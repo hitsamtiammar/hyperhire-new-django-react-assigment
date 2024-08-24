@@ -1,6 +1,7 @@
 import { Box, Button, Grid, TextField, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { ListDataItem } from './ListData'
+import { useEffect } from 'react'
 
 const EditFormTextField = styled(TextField)(({theme}) => ({
     backgroundColor: theme.palette.warning.main,
@@ -25,9 +26,14 @@ export interface EditFormProps{
 }
 
 export default function EditForm({ data }: EditFormProps) {
+    useEffect(() => {
+        console.log('data change', { data })
+    }, [data])
+
     if(!data){
         return null
     }
+
     return (
         <Grid container direction="column">
             <BoxInput>
@@ -46,7 +52,7 @@ export default function EditForm({ data }: EditFormProps) {
                 <Typography fontSize="14px" color="secondary.light">Parent Data</Typography>
                 <EditFormTextField disabled InputProps={{
                     disableUnderline: true,
-                }} value={data.parent} />
+                }} value={data.parent || ''} />
             </BoxInput>
             <BoxInput>
                 <Typography fontSize="14px" color="secondary.light">Name</Typography>
@@ -54,7 +60,10 @@ export default function EditForm({ data }: EditFormProps) {
                     disableUnderline: true,
                 }} value={data.name}/>
             </BoxInput>
+            <Grid container direction="row">
+            <SubmitButton variant="contained" fullWidth color="error">Delete</SubmitButton>
             <SubmitButton variant="contained" fullWidth color="blue">Save</SubmitButton>
+            </Grid>
         </Grid>
     )
 }

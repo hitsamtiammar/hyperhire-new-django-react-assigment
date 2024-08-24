@@ -18,7 +18,7 @@ export interface ListDataItem{
 export interface ListDataProps{
     data: ListDataItem
     expanded?: boolean
-    onCancelItemSelected: (index: string) => void
+    onCancelItemSelected?: (index: string) => void
     onItemSelected: (item: ListDataItem) => void
 }
 
@@ -36,16 +36,22 @@ const ListDataBox = styled((props: BoxProps) =>
         userSelect: 'none'
     })
 
-export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, data, expanded: expandedProps = false } : ListDataProps, ref: Ref<ListDataRef>) {
+export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, data, expanded: expandedProps = false } : ListDataProps, 
+    ref: Ref<ListDataRef>) {
+
     const [expanded, setExpanded] = useState(expandedProps)
     const [childExpanded, setChildExpaded] = useState(expandedProps)
     const [showAddBtn, setShowAddBtn] = useState(false)
-    const [childrenData, setChildrenData] = useState(data.children)
+    const [childrenData, setChildrenData] = useState(data?.children || [])
     const listMenuRef = useRef<ListDataRef>(null)
 
     useEffect(() => {
         setExpanded(expandedProps)
     },[expandedProps])
+
+    useEffect(() => {
+        setChildrenData(data?.children || [])
+    }, [data])
 
     const onHover = () => {
         setShowAddBtn(true)
@@ -67,6 +73,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
         }])
     }
 
+     
     useImperativeHandle(ref, () => ({
         collapseAll: () => {
             setChildExpaded(false)
@@ -105,7 +112,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
                     </Box>
                 )}
                 <Typography>{data.name}</Typography>
-                {showAddBtn && (
+                {(showAddBtn && data.parent ) && (
                     <IconButton onClick={onAddBtnClicked} color='blue'>
                         <AddCircleIcon sx={{fontSize:'30px'}} />
                     </IconButton>
@@ -128,20 +135,24 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
         )
     }
 
+    if(!data){
+        return  null;
+    }
+
     return (
         <Grid marginTop="24px" container direction="column">
         <ListDataBox onDoubleClick={onItemSelectedDblClick} onMouseEnter={onHover} onMouseLeave={onBlur}>
             {data.id !== '' ? renderItem() : renderAddItem()}
         </ListDataBox>
         {expanded && (
-                <Grid padding="0" container direction="row" item>
+            <Grid padding="0" container direction="row" item>
                 <Box width="30px" sx={{ transform: 'translateX(12px)', borderLeft: '1px solid lightgray' }} display="flex"/>
                 <Box display="flex" flexDirection="column" flex={1}>
                     {childrenData.map(item => {
-                       return <ForwardedListData onItemSelected={onItemSelected} onCancelItemSelected={onCancelConfirmed} ref={listMenuRef} expanded={childExpanded} key={item.name || item.tempId} data={item} />
+                        return <ForwardedListData onItemSelected={onItemSelected} onCancelItemSelected={onCancelConfirmed} ref={listMenuRef} expanded={childExpanded} key={item.name || item.tempId} data={item} />
                     })}
                 </Box>
-                </Grid>
+            </Grid>
         )}
 
         </Grid>
@@ -150,4 +161,4 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
 
 const ForwardedListData = forwardRef(ListData)
 
-export default React.memo(ForwardedListData)
+export default ForwardedListData
