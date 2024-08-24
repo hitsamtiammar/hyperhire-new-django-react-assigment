@@ -6,7 +6,7 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import EditForm from '@/components/data/EditForm';
-import ListData, { ListDataRef } from '@/components/data/ListData';
+import ListData, { ListDataItem, ListDataRef } from '@/components/data/ListData';
 import { useRef, useState } from 'react';
 
 const Container = styled(Grid)(() => ({
@@ -32,22 +32,7 @@ const MenuButton = styled(Button)(({theme}) => ({
     minWidth: '133px'
 }))
 
-const DUMMY_DATA = {
-        "id": "15e5ab97-8464-4314-9dd0-ad0bb206a425",
-        "parent": "65d61ab2-06ae-4e6b-8289-977de2842089",
-        "name": "Menus",
-        "children": [
-            {
-                "id": "b6cae5a1-4848-4336-aa1c-6dbbe4a14251",
-                "parent": "15e5ab97-8464-4314-9dd0-ad0bb206a425",
-                "name": "Menu Registration",
-                "children": [],
-                "depth": 4
-            }
-        ],
-        "depth": 3
-    }
-
+import DUMMY_DATA from './DUMMY_DATA';
 
 export default function Home() {
     const [menuExpanded, setMenuExpanded] = useState(false)
@@ -90,45 +75,7 @@ export default function Home() {
                     <MenuButton onClick={onExpandAll} color="info" variant="contained">Expand All</MenuButton>
                     <MenuButton onClick={onCollapseAll} color="info" variant="outlined">Collapse All</MenuButton>
                 </Grid>
-                <ListData expanded={menuExpanded} ref={listMenuRef} data={{
-                        name: 'Hehe',
-                        children: [
-                            {
-                                name: 'Data scond',
-                                children: [
-                                    {
-                                        name: 'Data hehe',
-                                        children: []
-                                    },
-                                    {
-                                        name: 'Data Haha',
-                                        children: []
-                                    },
-                                ]
-                            },
-                            {
-                                name: 'Data Third',
-                                children: [
-                                    {
-                                        name: 'Data Jaja',
-                                        children: [                                  
-                                        {
-                                            name: 'Data hehe',
-                                            children: []
-                                        },]
-                                    },
-                                    {
-                                        name: 'Data Jojojojo',
-                                        children: []
-                                    },
-                                ]
-                            },
-                            {
-                                name: 'Data Third 34',
-                                children: []
-                            },
-                        ]
-                }}/>
+                <ListData expanded={menuExpanded} ref={listMenuRef} data={DUMMY_DATA as ListDataItem[]}/>
             </Grid>
             <Grid item md={6} sm={12}>
                 <EditForm/>
