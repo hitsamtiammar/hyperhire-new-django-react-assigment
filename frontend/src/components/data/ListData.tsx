@@ -56,6 +56,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
 
     const onAddBtnClicked = (e:React.MouseEvent) => {
         e.stopPropagation()
+        setExpanded(true)
         setChildrenData([...childrenData, {
             children: [],
             depth: 0,
