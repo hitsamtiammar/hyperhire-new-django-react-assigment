@@ -4,21 +4,27 @@ def get_by_id(id):
     try:
        d = MenuItem.objects.get(pk = id)
        return d
-    except Exception:
+    except Exception as err:
+        print('An exception on get_by_id')
+        print(err)
         return None
     
 def get_all():
     try:
        d = MenuItem.objects.all()
        return d
-    except Exception:
+    except Exception as err:
+        print('An exception on get_all')
+        print(err)
         return None
 
 def get_all_root():
     try:
        d = MenuItem.objects.filter(parent_id__isnull = True)
        return d
-    except Exception:
+    except Exception as err:
+        print('An exception on get_all_root')
+        print(err)
         return []
     
 def get_all_data(id, depth = 1):
