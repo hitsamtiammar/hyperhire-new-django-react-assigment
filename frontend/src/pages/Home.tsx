@@ -11,7 +11,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAddMenuItemMutation, useGetRootMenuItemQuery, useLazyGetAllDataFromRootIdQuery } from '@/api/menuItemApi';
 import Swal from 'sweetalert2';
 import { showError } from '@/utils';
-import { OPEN_MENU, OPEN_MENU_BLACK } from '@/assets/logo';
 
 const Container = styled(Grid)(() => ({
     margin: '35px 48px',
@@ -75,11 +74,12 @@ export default function Home() {
         }
     }
 
-    async function onSelectRootData(e: SelectChangeEvent){
-        console.log('Selected', e.target.value)
-        setCurrRoot(e.target.value)
-        if(e.target.value){
-            await loadRootData(e.target.value)
+    async function onSelectRootData(event: SelectChangeEvent){
+        console.log('Selected', event.target.value)
+        setCurrRoot(event.target.value)
+        const value = event.target.value
+        if(value){
+            await loadRootData(value)
         }
     }
 
@@ -149,7 +149,9 @@ export default function Home() {
             </Grid>
             <FormControl sx={{ m: 1, minWidth: 120, marginTop: 4 }}>
                 <Typography color="secondary.light">Menu</Typography>
-                <MenuSelect onChange={onSelectRootData} value={currRoot} disabled={isLoading}>
+                <MenuSelect onChange={(event: object) => {
+                    onSelectRootData(event as SelectChangeEvent)
+                }} value={currRoot} disabled={isLoading}>
                     {rootData?.data.map(item => (
                         <MenuItem key={item.menu_id} value={item.menu_id}>{item.name}</MenuItem>
                     ))}
