@@ -1,8 +1,9 @@
-import { Toolbar, List,  IconButton, Grid, ListItem, ListItemButton, ListItemIcon, ListItemText, styled } from '@mui/material'
+import { Toolbar, List,  IconButton, Grid, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, useTheme, useMediaQuery } from '@mui/material'
 import Drawer from '@mui/material/Drawer'
 import { CLOIT_LOGO, OPEN_MENU, PROPERTIES } from '@/assets/logo';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+import { noop } from '@/utils';
 
 export const drawerWidth = '255px';
 
@@ -16,7 +17,14 @@ const DrawerTransparentInnerList = styled(List)(() => ({
     borderRadius: '16px'
 }))
 
-export default function AppDrawer() {
+export interface AppDrawerProps{
+  open: boolean
+  onClose: () => void
+}
+
+export default function AppDrawer({ open = false, onClose=noop }: AppDrawerProps) {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
   return (
     <Drawer
     sx={{
@@ -30,13 +38,14 @@ export default function AppDrawer() {
         borderRadius: '24px',
       },
     }}
-    variant="permanent"
+    variant={!matches ? 'temporary' :"permanent"}
     anchor="left"
+    open={open}
   >
     <Toolbar>
         <Grid height="84px" container direction="row" justifyContent="space-between">
             <img src={CLOIT_LOGO} alt='Cloit Logo' />
-            <IconButton>
+            <IconButton onClick={onClose}>
                 <img src={OPEN_MENU} alt="Open Menu"/>
             </IconButton>
         </Grid>
