@@ -39,4 +39,8 @@ declare module '@mui/material'{
     interface ButtonPropsColorOverrides {
         blue: true;
     }
+
+    interface IconButtonPropsColorOverrides{
+        blue: true
+    }
 }

@@ -1,4 +1,4 @@
-import { Button, Grid,  MenuItem,  Typography } from '@mui/material'
+import { Button, Grid,  MenuItem,  Typography,IconButtonProps } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import FolderIcon from '@mui/icons-material/Folder';
 import Avatar from '@mui/material/Avatar';
@@ -6,6 +6,8 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import EditForm from '@/components/data/EditForm';
+import ListData, { ListDataRef } from '@/components/data/ListData';
+import { useRef, useState } from 'react';
 
 const Container = styled(Grid)(() => ({
     margin: '35px 48px',
@@ -30,7 +32,37 @@ const MenuButton = styled(Button)(({theme}) => ({
     minWidth: '133px'
 }))
 
+const DUMMY_DATA = {
+        "id": "15e5ab97-8464-4314-9dd0-ad0bb206a425",
+        "parent": "65d61ab2-06ae-4e6b-8289-977de2842089",
+        "name": "Menus",
+        "children": [
+            {
+                "id": "b6cae5a1-4848-4336-aa1c-6dbbe4a14251",
+                "parent": "15e5ab97-8464-4314-9dd0-ad0bb206a425",
+                "name": "Menu Registration",
+                "children": [],
+                "depth": 4
+            }
+        ],
+        "depth": 3
+    }
+
+
 export default function Home() {
+    const [menuExpanded, setMenuExpanded] = useState(false)
+    const listMenuRef = useRef<ListDataRef>(null)
+
+    function onExpandAll(){
+        listMenuRef.current?.expandAll()
+        setMenuExpanded(true)
+        //setMenuExpanded(true)
+    }
+
+    function onCollapseAll(){
+        listMenuRef.current?.collapseAll()
+        setMenuExpanded(false)
+    }
   return (
     <Container>
         <Grid height="84px" direction="row" container >
@@ -53,11 +85,50 @@ export default function Home() {
             </MenuSelect>
         </FormControl>
         <Grid container marginTop="28px" direction="row">
-            <Grid item md={6} sm={12}>
+            <Grid marginBottom={10} item md={6} sm={12}>
                 <Grid gap={2}  container direction="row">
-                    <MenuButton color="info" variant="contained">Expand All</MenuButton>
-                    <MenuButton color="info" variant="outlined">Collapse All</MenuButton>
+                    <MenuButton onClick={onExpandAll} color="info" variant="contained">Expand All</MenuButton>
+                    <MenuButton onClick={onCollapseAll} color="info" variant="outlined">Collapse All</MenuButton>
                 </Grid>
+                <ListData expanded={menuExpanded} ref={listMenuRef} data={{
+                        name: 'Hehe',
+                        children: [
+                            {
+                                name: 'Data scond',
+                                children: [
+                                    {
+                                        name: 'Data hehe',
+                                        children: []
+                                    },
+                                    {
+                                        name: 'Data Haha',
+                                        children: []
+                                    },
+                                ]
+                            },
+                            {
+                                name: 'Data Third',
+                                children: [
+                                    {
+                                        name: 'Data Jaja',
+                                        children: [                                  
+                                        {
+                                            name: 'Data hehe',
+                                            children: []
+                                        },]
+                                    },
+                                    {
+                                        name: 'Data Jojojojo',
+                                        children: []
+                                    },
+                                ]
+                            },
+                            {
+                                name: 'Data Third 34',
+                                children: []
+                            },
+                        ]
+                }}/>
             </Grid>
             <Grid item md={6} sm={12}>
                 <EditForm/>
