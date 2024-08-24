@@ -1,5 +1,5 @@
 import { baseApi } from "./baseApi";
-import { GetAllDataResponse, GetRootResponse } from "./menuItemApi.interface";
+import {  AddRequest, AddResponse, GetAllDataResponse, GetRootResponse, UpdateDeleteResponse, UpdateRequest } from "./menuItemApi.interface";
 
 export const menuItemApiSlice = baseApi.injectEndpoints({
     overrideExisting: true,
@@ -13,6 +13,47 @@ export const menuItemApiSlice = baseApi.injectEndpoints({
                 }
             }),
             transformResponse: (response: GetRootResponse) => response,
+            transformErrorResponse: (error) => {
+                return error
+            }
+        }),
+        deleteMenuItem: builder.mutation<UpdateDeleteResponse, string>({
+            query: (params) => ({
+                url: `delete/${params}`,
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json'
+                }
+            }),
+            transformResponse: (response: UpdateDeleteResponse) => response,
+            transformErrorResponse: (error) => {
+                return error
+            }
+        }),
+        updateMenuItem: builder.mutation<UpdateDeleteResponse, UpdateRequest>({
+            query: (params) => ({
+                url: 'update/',
+                method: 'PUT',
+                body: params,
+                headers: {
+                    Accept: 'application/json'
+                }
+            }),
+            transformResponse: (response: UpdateDeleteResponse) => response,
+            transformErrorResponse: (error) => {
+                return error
+            }
+        }),
+        addMenuItem: builder.mutation<AddResponse, AddRequest>({
+            query: (params) => ({
+                url: 'add/',
+                method: 'POST',
+                body: params,
+                headers: {
+                    Accept: 'application/json'
+                }
+            }),
+            transformResponse: (response: AddResponse) => response,
             transformErrorResponse: (error) => {
                 return error
             }
@@ -35,5 +76,8 @@ export const menuItemApiSlice = baseApi.injectEndpoints({
 
 export const {
     useGetRootMenuItemQuery,
-    useLazyGetAllDataFromRootIdQuery
+    useLazyGetAllDataFromRootIdQuery,
+    useDeleteMenuItemMutation,
+    useUpdateMenuItemMutation,
+    useAddMenuItemMutation
 } = menuItemApiSlice

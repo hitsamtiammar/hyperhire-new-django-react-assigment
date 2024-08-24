@@ -5,6 +5,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {Close } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { noop } from '@/utils';
+import { useForm } from 'react-hook-form';
 
 export interface ListDataItem{
     id: string;
@@ -20,6 +21,7 @@ export interface ListDataProps{
     expanded?: boolean
     onCancelItemSelected?: (index: string) => void
     onItemSelected: (item: ListDataItem) => void
+    onAddConfirmed: (name: string, parentId: string) => void
 }
 
 export interface ListDataRef{
@@ -36,7 +38,13 @@ const ListDataBox = styled((props: BoxProps) =>
         userSelect: 'none'
     })
 
-export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, data, expanded: expandedProps = false } : ListDataProps, 
+export function ListData({ 
+    onCancelItemSelected = noop, 
+    onItemSelected = noop, 
+    data, 
+    expanded: expandedProps = false,
+    onAddConfirmed
+} : ListDataProps, 
     ref: Ref<ListDataRef>) {
 
     const [expanded, setExpanded] = useState(expandedProps)
@@ -44,6 +52,10 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
     const [showAddBtn, setShowAddBtn] = useState(false)
     const [childrenData, setChildrenData] = useState(data?.children || [])
     const listMenuRef = useRef<ListDataRef>(null)
+    const { register, handleSubmit } = useForm({
+        mode: 'onBlur',
+        defaultValues: { name: '' }
+    })
 
     useEffect(() => {
         setExpanded(expandedProps)
@@ -61,6 +73,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
     }
 
     const onAddBtnClicked = (e:React.MouseEvent) => {
+
         e.stopPropagation()
         setExpanded(true)
         setChildrenData([...childrenData, {
@@ -68,7 +81,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
             depth: 0,
             id: '',
             name: '',
-            parent: null,
+            parent: data.id,
             tempId: `temp-${new Date().getTime()}`
         }])
     }
@@ -98,9 +111,15 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
     }
 
     function onItemSelectedDblClick(e: React.MouseEvent){
+        if(data.tempId){
+            return
+        }
         e.stopPropagation()
-        console.log('Item seleced triggered')
         onItemSelected(data)
+    }
+
+    function onDataChecked(formData: { name: string }){
+        onAddConfirmed(formData.name, data?.parent as string)
     }
 
     function renderItem(){
@@ -112,7 +131,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
                     </Box>
                 )}
                 <Typography>{data.name}</Typography>
-                {(showAddBtn && data.parent ) && (
+                {(showAddBtn) && (
                     <IconButton onClick={onAddBtnClicked} color='blue'>
                         <AddCircleIcon sx={{fontSize:'30px'}} />
                     </IconButton>
@@ -124,8 +143,8 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
     function renderAddItem(){
         return (
             <>
-                <TextField/>
-                <IconButton>
+                <TextField {...register('name')} />
+                <IconButton onClick={handleSubmit(onDataChecked)}>
                     <CheckIcon color="success" />
                 </IconButton>
                 <IconButton onClick={onCancel}>
@@ -149,7 +168,7 @@ export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, d
                 <Box width="30px" sx={{ transform: 'translateX(12px)', borderLeft: '1px solid lightgray' }} display="flex"/>
                 <Box display="flex" flexDirection="column" flex={1}>
                     {childrenData.map(item => {
-                        return <ForwardedListData onItemSelected={onItemSelected} onCancelItemSelected={onCancelConfirmed} ref={listMenuRef} expanded={childExpanded} key={item.name || item.tempId} data={item} />
+                        return <ForwardedListData onAddConfirmed={onAddConfirmed} onItemSelected={onItemSelected} onCancelItemSelected={onCancelConfirmed} ref={listMenuRef} expanded={childExpanded} key={item.name || item.tempId} data={item} />
                     })}
                 </Box>
             </Grid>

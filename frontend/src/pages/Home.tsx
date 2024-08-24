@@ -4,17 +4,19 @@ import FolderIcon from '@mui/icons-material/Folder';
 import Avatar from '@mui/material/Avatar';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { SelectChangeEvent, SelectProps } from '@mui/material/Select';
 import EditForm from '@/components/data/EditForm';
 import ListData, { ListDataItem, ListDataRef } from '@/components/data/ListData';
-import { useRef, useState } from 'react';
-import { useGetRootMenuItemQuery, useLazyGetAllDataFromRootIdQuery } from '@/api/menuItemApi';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAddMenuItemMutation, useGetRootMenuItemQuery, useLazyGetAllDataFromRootIdQuery } from '@/api/menuItemApi';
+import Swal from 'sweetalert2';
+import { showError } from '@/utils';
 
 const Container = styled(Grid)(() => ({
     margin: '35px 48px',
 }))
 
-const MenuSelect = styled(Select)(({ theme }) => ({
+const MenuSelect = styled((props: SelectProps) => <Select onChange={props.onChange} {...props} />)(({ theme }) => ({
     width: '349px',
     borderRadius: '16px',
     backgroundColor: theme.palette.warning.main
@@ -37,10 +39,17 @@ export default function Home() {
     const [menuExpanded, setMenuExpanded] = useState(false)
     const listMenuRef = useRef<ListDataRef>(null)
     const [selectedItem, setSelectedItem] = useState<ListDataItem | null>(null)
-    const { data: rootData, isLoading } = useGetRootMenuItemQuery()
+    const { data: rootData, isLoading, refetch } = useGetRootMenuItemQuery()
+    const [addNewItem] = useAddMenuItemMutation()
     const [fetchDataByRootId] = useLazyGetAllDataFromRootIdQuery()
-    const [listData, setListData] = useState<ListDataItem>()
+    const [listData, setListData] = useState<ListDataItem | null>(null)
     const [currRoot, setCurrRoot] = useState('')
+
+    useEffect(() => {
+        if(menuExpanded){
+            setSelectedItem(null)
+        }
+    }, [menuExpanded])
     
     function onExpandAll(){
         listMenuRef.current?.expandAll()
@@ -57,17 +66,71 @@ export default function Home() {
         try{
             const result = await fetchDataByRootId(currRoot)
             const resultData = result.data?.data
-            console.log('resultData', { resultData})
             setListData(resultData as ListDataItem)
         }catch(err){
             console.log('error on load root data', err)
+            showError('An error on load Root Data')
         }
     }
 
     async function onSelectRootData(e: SelectChangeEvent){
         console.log('Selected', e.target.value)
         setCurrRoot(e.target.value)
-        await loadRootData(e.target.value)
+        if(e.target.value){
+            await loadRootData(e.target.value)
+        }
+    }
+
+    function onDataMutated(data: ListDataItem){
+        setListData(null)
+        setSelectedItem(null)
+        if(data.parent){
+            loadRootData(currRoot)
+        }else{
+            refetch()
+        }
+    }
+
+    function onRootDataMutated(){
+        setListData(null)
+        setSelectedItem(null)
+        refetch()
+    }
+
+    async function doInsert(name: string, parentId: string, callback: () => void){
+        try{
+            await addNewItem({
+                name,
+                parent: parentId || null
+            })
+            callback()
+        }catch(err){
+            console.log('error on add confirmed', err)
+            showError('An error on Insertion')
+        }
+    } 
+
+    async function onAddConfirmed(name: string, parentId: string){
+        await doInsert(name, parentId, () => {
+            loadRootData(currRoot)
+        })
+    }
+
+    async function onAddRootClicked(e:React.MouseEvent){
+        e.preventDefault()
+        const { value } = await Swal.fire({
+            title: "New Root Data",
+            input: "text",
+            inputLabel: "Enter your new Root data",
+            inputValue: '',
+            showCancelButton: true,
+            inputValidator: (value) => {
+              if (!value) {
+                return "You need to write something!";
+              }
+            }
+          });
+        await doInsert(value, '', () => onRootDataMutated())
     }
 
     return (
@@ -86,9 +149,9 @@ export default function Home() {
                 <Typography color="secondary.light">Menu</Typography>
                 <MenuSelect onChange={onSelectRootData} value={currRoot} disabled={isLoading}>
                     {rootData?.data.map(item => (
-                        <MenuItem value={item.menu_id}>{item.name}</MenuItem>
+                        <MenuItem key={item.menu_id} value={item.menu_id}>{item.name}</MenuItem>
                     ))}
-                    <MenuItem onClick={(e) => e.preventDefault()}>
+                    <MenuItem onClick={onAddRootClicked}>
                         <Button fullWidth variant="contained" color="blue">Add new Item</Button>
                     </MenuItem>
                 </MenuSelect>
@@ -99,10 +162,10 @@ export default function Home() {
                         <MenuButton onClick={onExpandAll} color="info" variant="contained">Expand All</MenuButton>
                         <MenuButton onClick={onCollapseAll} color="info" variant="outlined">Collapse All</MenuButton>
                     </Grid>
-                    {!isLoading && <ListData onItemSelected={(item) => setSelectedItem(item)} expanded={menuExpanded} ref={listMenuRef} data={listData as ListDataItem}/>}
+                    {!isLoading && <ListData onAddConfirmed={onAddConfirmed} onItemSelected={(item) => setSelectedItem(item)} expanded={menuExpanded} ref={listMenuRef} data={listData as ListDataItem}/>}
                 </Grid>
                 <Grid item md={6} sm={12}>
-                    <EditForm data={selectedItem} />
+                    <EditForm onDataMutated={onDataMutated} data={selectedItem} />
                 </Grid>
             </Grid>
         </Container>
