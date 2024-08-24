@@ -37,6 +37,7 @@ import DUMMY_DATA from './DUMMY_DATA';
 export default function Home() {
     const [menuExpanded, setMenuExpanded] = useState(false)
     const listMenuRef = useRef<ListDataRef>(null)
+    const [selectedItem, setSelectedItem] = useState<ListDataItem | null>(null)
 
     function onExpandAll(){
         listMenuRef.current?.expandAll()
@@ -75,10 +76,10 @@ export default function Home() {
                     <MenuButton onClick={onExpandAll} color="info" variant="contained">Expand All</MenuButton>
                     <MenuButton onClick={onCollapseAll} color="info" variant="outlined">Collapse All</MenuButton>
                 </Grid>
-                <ListData expanded={menuExpanded} ref={listMenuRef} data={DUMMY_DATA as ListDataItem[]}/>
+                <ListData onItemSelected={(item) => setSelectedItem(item)} expanded={menuExpanded} ref={listMenuRef} data={DUMMY_DATA as ListDataItem[]}/>
             </Grid>
             <Grid item md={6} sm={12}>
-                <EditForm/>
+                <EditForm data={selectedItem} />
             </Grid>
         </Grid>
     </Container>

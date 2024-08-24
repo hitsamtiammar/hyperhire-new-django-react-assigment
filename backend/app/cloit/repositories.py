@@ -32,10 +32,12 @@ def get_all_data(id, depth = 1):
 
         return {
             'id': curr_data.menu_id,
-            'parent': curr_data.parent_id,
+            'parent': curr_data.parent.name if curr_data.parent is not None else None,
             'name': curr_data.name,
             'children': children_data,
             'depth': depth
         }
-    except Exception:
+    except Exception as err:
+        print('An exception on get_all_data')
+        print(err)
         return []

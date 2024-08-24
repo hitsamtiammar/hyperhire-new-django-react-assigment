@@ -1,5 +1,6 @@
 import { Box, Button, Grid, TextField, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { ListDataItem } from './ListData'
 
 const EditFormTextField = styled(TextField)(({theme}) => ({
     backgroundColor: theme.palette.warning.main,
@@ -19,34 +20,41 @@ const SubmitButton = styled(Button)({
     borderRadius:'48px'
 })
 
-export default function EditForm() {
-  return (
-    <Grid container direction="column">
-        <BoxInput>
-            <Typography fontSize="14px" color="secondary.light">Menu ID</Typography>
-            <EditFormTextField fullWidth disabled InputProps={{
-                disableUnderline: true,
-            }} value="3452-2344-3244-3242-234" />
-        </BoxInput>
-        <BoxInput>
-            <Typography fontSize="14px" color="secondary.light">Depth</Typography>
-            <EditFormTextField disabled InputProps={{
-                disableUnderline: true,
-            }} value={3} />
-        </BoxInput>
-        <BoxInput>
-            <Typography fontSize="14px" color="secondary.light">Parent Data</Typography>
-            <EditFormTextField disabled InputProps={{
-                disableUnderline: true,
-            }} value="System" />
-        </BoxInput>
-        <BoxInput>
-            <Typography fontSize="14px" color="secondary.light">Name</Typography>
-            <EditFormTextField InputProps={{
-                disableUnderline: true,
-            }} value="Status code"/>
-        </BoxInput>
-        <SubmitButton variant="contained" fullWidth color="blue">Save</SubmitButton>
-    </Grid>
-  )
+export interface EditFormProps{
+    data: ListDataItem | null
+}
+
+export default function EditForm({ data }: EditFormProps) {
+    if(!data){
+        return null
+    }
+    return (
+        <Grid container direction="column">
+            <BoxInput>
+                <Typography fontSize="14px" color="secondary.light">Menu ID</Typography>
+                <EditFormTextField fullWidth disabled InputProps={{
+                    disableUnderline: true,
+                }} value={data.id} />
+            </BoxInput>
+            <BoxInput>
+                <Typography fontSize="14px" color="secondary.light">Depth</Typography>
+                <EditFormTextField disabled InputProps={{
+                    disableUnderline: true,
+                }} value={data.depth} />
+            </BoxInput>
+            <BoxInput>
+                <Typography fontSize="14px" color="secondary.light">Parent Data</Typography>
+                <EditFormTextField disabled InputProps={{
+                    disableUnderline: true,
+                }} value={data.parent} />
+            </BoxInput>
+            <BoxInput>
+                <Typography fontSize="14px" color="secondary.light">Name</Typography>
+                <EditFormTextField InputProps={{
+                    disableUnderline: true,
+                }} value={data.name}/>
+            </BoxInput>
+            <SubmitButton variant="contained" fullWidth color="blue">Save</SubmitButton>
+        </Grid>
+    )
 }

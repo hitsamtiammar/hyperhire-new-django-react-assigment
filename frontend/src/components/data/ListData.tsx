@@ -19,6 +19,7 @@ export interface ListDataProps{
     data: ListDataItem
     expanded?: boolean
     onCancelItemSelected: (index: string) => void
+    onItemSelected: (item: ListDataItem) => void
 }
 
 export interface ListDataRef{
@@ -35,7 +36,7 @@ const ListDataBox = styled((props: BoxProps) =>
         userSelect: 'none'
     })
 
-export function ListData({ onCancelItemSelected = noop, data, expanded: expandedProps = false } : ListDataProps, ref: Ref<ListDataRef>) {
+export function ListData({ onCancelItemSelected = noop, onItemSelected = noop, data, expanded: expandedProps = false } : ListDataProps, ref: Ref<ListDataRef>) {
     const [expanded, setExpanded] = useState(expandedProps)
     const [childExpanded, setChildExpaded] = useState(expandedProps)
     const [showAddBtn, setShowAddBtn] = useState(false)
@@ -80,6 +81,7 @@ export function ListData({ onCancelItemSelected = noop, data, expanded: expanded
     function onCancel(){
         // console.log('Cancelled data', { i: data.index, data})
         onCancelItemSelected(data.tempId as string)
+        
     }
 
     function onCancelConfirmed(tempId: string){
@@ -87,11 +89,19 @@ export function ListData({ onCancelItemSelected = noop, data, expanded: expanded
         setChildrenData(newChildren)
     }
 
+    function onItemSelectedDblClick(e: React.MouseEvent){
+        e.stopPropagation()
+        console.log('Item seleced triggered')
+        onItemSelected(data)
+    }
+
     function renderItem(){
         return (
             <>
                 {data.children.length > 0 && (
-                    <KeyboardArrowDownRoundedIcon/>
+                    <Box onClick={() => setExpanded(!expanded)}>
+                        <KeyboardArrowDownRoundedIcon/>
+                    </Box>
                 )}
                 <Typography>{data.name}</Typography>
                 {showAddBtn && (
@@ -119,7 +129,7 @@ export function ListData({ onCancelItemSelected = noop, data, expanded: expanded
 
     return (
         <Grid marginTop="24px" container direction="column">
-        <ListDataBox onMouseEnter={onHover} onMouseLeave={onBlur} onClick={() => setExpanded(!expanded)}>
+        <ListDataBox onDoubleClick={onItemSelectedDblClick} onMouseEnter={onHover} onMouseLeave={onBlur}>
             {data.id !== '' ? renderItem() : renderAddItem()}
         </ListDataBox>
         {expanded && (
@@ -127,7 +137,7 @@ export function ListData({ onCancelItemSelected = noop, data, expanded: expanded
                 <Box width="30px" sx={{ transform: 'translateX(12px)', borderLeft: '1px solid lightgray' }} display="flex"/>
                 <Box display="flex" flexDirection="column" flex={1}>
                     {childrenData.map(item => {
-                       return <ForwardedListData onCancelItemSelected={onCancelConfirmed} ref={listMenuRef} expanded={childExpanded} key={item.name || item.tempId} data={item} />
+                       return <ForwardedListData onItemSelected={onItemSelected} onCancelItemSelected={onCancelConfirmed} ref={listMenuRef} expanded={childExpanded} key={item.name || item.tempId} data={item} />
                     })}
                 </Box>
                 </Grid>
@@ -139,4 +149,4 @@ export function ListData({ onCancelItemSelected = noop, data, expanded: expanded
 
 const ForwardedListData = forwardRef(ListData)
 
-export default ForwardedListData
+export default React.memo(ForwardedListData)
