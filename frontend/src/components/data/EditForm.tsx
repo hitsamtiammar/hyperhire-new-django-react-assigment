@@ -1,9 +1,10 @@
-import { Box, Button, Grid, TextField, Typography } from '@mui/material'
+import { Box, Button, Grid, IconButton, TextField, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { ListDataItem } from './ListData'
 import { useEffect, useState } from 'react'
 import { useDeleteMenuItemMutation, useUpdateMenuItemMutation } from '@/api/menuItemApi'
 import { noop, showError } from '@/utils'
+import { Close } from '@mui/icons-material'
 
 const EditFormTextField = styled(TextField)(({theme}) => ({
     backgroundColor: theme.palette.warning.main,
@@ -26,9 +27,10 @@ const SubmitButton = styled(Button)({
 export interface EditFormProps{
     data: ListDataItem | null
     onDataMutated?: (data: ListDataItem) => void
+    onClose?: () => void
 }
 
-export default function EditForm({ data, onDataMutated = noop }: EditFormProps) {
+export default function EditForm({ data, onDataMutated = noop, onClose = noop }: EditFormProps) {
     const [name, setName] = useState(data?.name)
     const [updateMenuItem, { isLoading: isUpdateLoading }] = useUpdateMenuItemMutation()
     const [deleteMenuItem, { isLoading: isDeleteLoading }] = useDeleteMenuItemMutation()
@@ -65,6 +67,12 @@ export default function EditForm({ data, onDataMutated = noop }: EditFormProps) 
 
     return (
         <Grid container direction="column">
+            <Grid container direction="column" alignItems="flex-end">
+            <IconButton onClick={onClose} sx={{height: '20px', width: '50px', marginBottom: '20px'}}>
+                <Close color="error" />
+            </IconButton>
+            </Grid>
+           
             <BoxInput>
                 <Typography fontSize="14px" color="secondary.light">Menu ID</Typography>
                 <EditFormTextField fullWidth disabled InputProps={{

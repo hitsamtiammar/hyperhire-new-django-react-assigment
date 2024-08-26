@@ -45,7 +45,6 @@ export default function Home() {
     const [listData, setListData] = useState<ListDataItem | null>(null)
     const [currRoot, setCurrRoot] = useState('')
 
-
     useEffect(() => {
         if(menuExpanded){
             setSelectedItem(null)
@@ -169,7 +168,7 @@ export default function Home() {
                     {!isLoading && <ListData onAddConfirmed={onAddConfirmed} onItemSelected={(item) => setSelectedItem(item)} expanded={menuExpanded} ref={listMenuRef} data={listData as ListDataItem}/>}
                 </Grid>
                 <Grid item md={6} sm={12}>
-                    <EditForm onDataMutated={onDataMutated} data={selectedItem} />
+                    <EditForm onClose={() => setSelectedItem(null)} onDataMutated={onDataMutated} data={selectedItem} />
                 </Grid>
             </Grid>
         </Container>
