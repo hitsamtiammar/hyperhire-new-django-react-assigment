@@ -44,7 +44,7 @@ def insert(request):
 @api_view(['PUT'])
 def update(request):
     request_data = JSONParser().parse(request)
-    result_update = repositories.insert_new_data(request_data)
+    result_update = repositories.update_data(request_data)
     if(result_update['status'] == 1):
         return JsonResponse({
             'status': True,
