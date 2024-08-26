@@ -29,52 +29,41 @@ def views_data_data(request, id):
 @api_view(['POST'])
 def insert(request):
     request_data = JSONParser().parse(request)
-    new_data = MenuItem(name = request_data['name'])
-    if 'parent' in request_data and request_data['parent'] is not None:
-        parent_id =  request_data['parent']
-        parent = repositories.get_by_id(parent_id)
-        if parent is None:
-            return JsonResponse(data = {
-                'status': False,
-                'message': f"Parent with id {parent_id} is not found"
-            }, status = 404)
-        new_data.parent = parent
-    new_data.save()
-    serialized = MenuItemSerializer(new_data)
-
-    return JsonResponse({
-        'status': True,
-        'message': 'Success',
-        'new_data': serialized.data
-    })
+    result_insert = repositories.insert_new_data(request_data)
+    if(result_insert['status'] == 1):
+        return JsonResponse({
+             'status': True,
+                'message': 'Success',
+                'new_data': result_insert['data']
+        })
+    return JsonResponse(data = {
+            'status': False,
+            'message': result_insert['message']
+        }, status = result_insert['code'])
 
 @api_view(['PUT'])
 def update(request):
     request_data = JSONParser().parse(request)
-    id = request_data['id']
-    curr_data = repositories.get_by_id(id)
-    if curr_data is None:
-        return JsonResponse(data = {
-            'status': False,
-            'message': f"Data with id {id} is not found"
-        }, status = 404)
-    curr_data.name = request_data['name']
-    curr_data.save()
-    return JsonResponse({
-        'status': True,
-        'message': 'Success',
-    })
+    result_update = repositories.insert_new_data(request_data)
+    if(result_update['status'] == 1):
+        return JsonResponse({
+            'status': True,
+            'message': 'Success',
+        })
+    return JsonResponse(data = {
+        'status': False,
+        'message': result_update['message']
+    }, status = result_update['code'])
 
 @api_view(['DELETE'])
 def delete(request, id):
-    curr_data = repositories.get_by_id(id)
-    if curr_data is None:
+    result_delete = repositories.delete_data(id)
+    if result_delete['status'] == 1:
         return JsonResponse(data = {
             'status': False,
             'message': f"Data with id {id} is not found"
         }, status = 404)
-    curr_data.delete()
-    return JsonResponse({
-        'status': True,
-        'message': 'Success',
-    })
+    return JsonResponse(data = {
+        'status': False,
+        'message': result_delete['message']
+    }, status = result_delete['code'])
