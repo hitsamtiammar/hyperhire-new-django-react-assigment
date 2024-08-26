@@ -90,7 +90,7 @@ def delete_data(id):
     try:
         curr_data = get_by_id(id)
         if curr_data is None:
-            return {'status': 1, 'code':404, 'data': None, 'message': 'data with id {id} is not found'}
+            return {'status': 0, 'code':404, 'data': None, 'message': 'data with id {id} is not found'}
         curr_data.delete()
         return {'status': 1, 'code':200, 'data': None, 'message': 'Success'}
     except Exception as err:

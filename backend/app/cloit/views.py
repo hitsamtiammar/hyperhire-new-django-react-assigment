@@ -57,11 +57,12 @@ def update(request):
 
 @api_view(['DELETE'])
 def delete(request, id):
+    print
     result_delete = repositories.delete_data(id)
     if result_delete['status'] == 1:
         return JsonResponse(data = {
-            'status': False,
-            'message': f"Data with id {id} is not found"
+            'status': True,
+            'message': 'Success',
         }, status = 404)
     return JsonResponse(data = {
         'status': False,
