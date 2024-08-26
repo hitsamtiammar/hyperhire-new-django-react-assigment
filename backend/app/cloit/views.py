@@ -63,7 +63,7 @@ def delete(request, id):
         return JsonResponse(data = {
             'status': True,
             'message': 'Success',
-        }, status = 404)
+        })
     return JsonResponse(data = {
         'status': False,
         'message': result_delete['message']
